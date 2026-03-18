@@ -16,7 +16,7 @@ if (SAVE_RECORDINGS && !fs.existsSync(AUDIO_DIR)) {
 
 const server = new MicrostreamServer({
   port: PORT,
-  audio: { sampleRate: 16000, bitDepth: 16, channels: 1 }
+  audio: { sampleRate: 11200, bitDepth: 16, channels: 1 }
 })
 
 const pipeline = new SpeechPipeline({
