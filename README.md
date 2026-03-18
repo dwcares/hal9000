@@ -13,7 +13,7 @@ HAL9000 demonstrates bidirectional audio streaming between a Particle device (Ph
 | Component | Description | Connection |
 |-----------|-------------|------------|
 | Particle Photon/Argon | Microcontroller | - |
-| Electret Microphone | With MAX4466 amplifier | A0 |
+| Electret Microphone | With MAX4466 amplifier | A6 |
 | Speaker | 8Ω, 0.5W with PAM8403 amp | A3 (DAC) |
 | Push Button | Momentary, normally open | D3 |
 | LED (optional) | Status indicator | D0 |
@@ -23,7 +23,7 @@ HAL9000 demonstrates bidirectional audio streaming between a Particle device (Ph
 ```
 Particle Photon
 ┌─────────────────┐
-│              A0 │──── Mic OUT (MAX4466)
+│              A6 │──── Mic OUT (MAX4466)
 │              A3 │──── Amp IN (PAM8403)
 │              D3 │──── Button ────┐
 │             GND │────────────────┴── GND
@@ -47,12 +47,12 @@ Create a `.env` file:
 cp .env.example .env
 ```
 
-Edit `.env` and add your OpenAI API key:
+Edit `.env` with your credentials:
 
 ```
 OPENAI_API_KEY=sk-your-key-here
-PORT=5000
-SYSTEM_PROMPT=You are HAL 9000, the sentient computer from 2001: A Space Odyssey. Respond in character with calm, measured responses. Keep answers brief.
+PARTICLE_USERNAME=your-email@example.com
+PARTICLE_PASSWORD=your-password
 ```
 
 Start the server:
@@ -60,6 +60,11 @@ Start the server:
 ```bash
 npm start
 ```
+
+The server will:
+- Login to Particle Cloud
+- Publish its IP address for device discovery
+- Listen for incoming device connections
 
 ### 2. Firmware Setup
 
@@ -77,12 +82,6 @@ cd firmware
 particle library install
 ```
 
-Edit `src/hal9000.ino` to set your server IP:
-
-```cpp
-#define SERVER_HOST  "192.168.1.100"  // Your server's IP
-```
-
 Compile and flash:
 
 ```bash
@@ -91,6 +90,8 @@ particle flash YOUR_DEVICE_NAME hal9000.bin
 ```
 
 Or use Particle Workbench in VS Code.
+
+> **Note:** No need to configure server IP - the device discovers it automatically via Particle Cloud!
 
 ## Usage
 
@@ -107,29 +108,56 @@ Or use Particle Workbench in VS Code.
 | Environment Variable | Default | Description |
 |---------------------|---------|-------------|
 | `OPENAI_API_KEY` | - | Your OpenAI API key (required) |
+| `PARTICLE_USERNAME` | - | Particle account email (for cloud discovery) |
+| `PARTICLE_PASSWORD` | - | Particle account password |
 | `PORT` | `5000` | Server port |
 | `OPENAI_MODEL` | `gpt-4o` | Chat model |
 | `OPENAI_VOICE` | `alloy` | TTS voice (alloy, echo, fable, onyx, nova, shimmer) |
 | `SYSTEM_PROMPT` | (default) | AI personality prompt |
+| `SAVE_RECORDINGS` | `false` | Save audio recordings to disk |
 
 ### Firmware Options
 
 Edit the defines at the top of `hal9000.ino`:
 
 ```cpp
-#define MIC_PIN      A0       // Microphone input
+#define MIC_PIN      A6       // Microphone input
 #define SPEAKER_PIN  A3       // Speaker output (DAC)
 #define BUTTON_PIN   D3       // Push-to-talk button
 #define LED_PIN      D0       // Status LED
-
-#define SERVER_HOST  "192.168.1.100"
 #define SERVER_PORT  5000
 ```
+
+## How Discovery Works
+
+The server and device find each other automatically via Particle Cloud:
+
+```
+┌─────────────────┐                      ┌─────────────────┐
+│  Node.js Server │                      │  Particle       │
+│                 │                      │  Device         │
+│ 1. Login to     │                      │                 │
+│    Particle     │                      │ 3. Subscribe to │
+│    Cloud        │                      │    server-ip    │
+│                 │                      │    events       │
+│ 2. Publish      │─── server-ip ───────►│                 │
+│    server IP    │    (via cloud)       │ 4. Cache IP in  │
+│                 │                      │    EEPROM       │
+│ 5. Listen for   │◄── device-online ────│                 │
+│    device-online│    (via cloud)       │ 5. Connect via  │
+│    (republish)  │                      │    TCP          │
+└─────────────────┘                      └─────────────────┘
+```
+
+- **First boot:** Device waits for server IP via cloud event
+- **Subsequent boots:** Device uses cached IP for instant connect
+- **Server restart:** Publishes new IP, devices update cache
 
 ## Dependencies
 
 ### Server
 - [microstream-server](https://www.npmjs.com/package/microstream-server) - Audio streaming
+- [particle-api-js](https://www.npmjs.com/package/particle-api-js) - Cloud discovery
 - [openai](https://www.npmjs.com/package/openai) - AI services
 - [dotenv](https://www.npmjs.com/package/dotenv) - Environment config
 
