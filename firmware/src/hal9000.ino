@@ -17,19 +17,57 @@
 // --- Hardware Pins ---
 #define LED_PIN      D0       // Status LED (or use D7 for onboard)
 #define BUTTON_PIN   D3       // Push-to-talk button
-#define MIC_PIN      A0       // Microphone input
+#define MIC_PIN      A6       // Microphone input (DAC pin, works as ADC)
 #define SPEAKER_PIN  A3       // Speaker output (DAC: A3 on Photon, A6 on Argon)
 
 // --- Server Configuration ---
-#define SERVER_HOST  "192.168.1.100"  // Change to your server IP
 #define SERVER_PORT  5000
 #define SERVER_PATH  "/"
+#define EEPROM_ADDR  0        // EEPROM address for cached IP
 
 Microstream mic;
 
+char serverHost[64] = "";     // Server IP from cloud discovery
+bool serverConfigured = false;
 bool buttonDown = false;
 unsigned long lastStatusTime = 0;
 unsigned long connectedSince = 0;
+
+// --- EEPROM helpers for IP caching ---
+void saveServerIP(const char* ip) {
+  uint8_t len = strlen(ip);
+  EEPROM.write(EEPROM_ADDR, len);
+  for (uint8_t i = 0; i < len; i++) {
+    EEPROM.write(EEPROM_ADDR + 1 + i, ip[i]);
+  }
+  Serial.printlnf("Cached server IP: %s", ip);
+}
+
+bool loadServerIP(char* ip, size_t maxLen) {
+  uint8_t len = EEPROM.read(EEPROM_ADDR);
+  if (len == 0 || len == 255 || len >= maxLen) return false;
+  for (uint8_t i = 0; i < len; i++) {
+    ip[i] = EEPROM.read(EEPROM_ADDR + 1 + i);
+  }
+  ip[len] = '\0';
+  return true;
+}
+
+// --- Cloud event handler ---
+void onServerIP(const char* event, const char* data) {
+  Serial.printlnf("Received server IP: %s", data);
+
+  // Only update if IP changed
+  if (strcmp(serverHost, data) != 0) {
+    strncpy(serverHost, data, sizeof(serverHost) - 1);
+    saveServerIP(serverHost);
+
+    if (!serverConfigured) {
+      serverConfigured = true;
+      startMicrostream();
+    }
+  }
+}
 
 // --- Callbacks ---
 void onMicConnected() {
@@ -50,6 +88,24 @@ void onPlaybackEnd() {
   Serial.println("Playback done");
 }
 
+void startMicrostream() {
+  MicrostreamConfig cfg;
+  cfg.sampleRate = 16000;
+  cfg.bitDepth = 16;
+  cfg.micPin = MIC_PIN;
+  cfg.speakerPin = SPEAKER_PIN;
+  cfg.captureBufferSize = 8192;
+  cfg.playbackBufferSize = 8192;
+
+  Serial.printlnf("Connecting to %s:%d%s", serverHost, SERVER_PORT, SERVER_PATH);
+
+  mic.begin(serverHost, SERVER_PORT, SERVER_PATH, cfg);
+  mic.onConnected(onMicConnected);
+  mic.onDisconnected(onMicDisconnected);
+  mic.onPlaybackStart(onPlaybackStart);
+  mic.onPlaybackEnd(onPlaybackEnd);
+}
+
 void setup() {
   Serial.begin(115200);
   delay(2000);
@@ -58,30 +114,31 @@ void setup() {
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
-  MicrostreamConfig cfg;
-  cfg.sampleRate = 16000;  // 16kHz - voice quality
-  cfg.bitDepth = 16;       // 16-bit signed PCM
-  cfg.micPin = MIC_PIN;
-  cfg.speakerPin = SPEAKER_PIN;
-  cfg.captureBufferSize = 8192;   // ~0.5 sec at 16kHz
-  cfg.playbackBufferSize = 8192;  // ~0.5 sec at 16kHz
+  // Subscribe to server IP events
+  Particle.subscribe("microstream/server-ip", onServerIP, MY_DEVICES);
 
-  Serial.printlnf("Connecting to %s:%d%s", SERVER_HOST, SERVER_PORT, SERVER_PATH);
+  // Try to load cached IP
+  if (loadServerIP(serverHost, sizeof(serverHost))) {
+    Serial.printlnf("Using cached server IP: %s", serverHost);
+    serverConfigured = true;
+    startMicrostream();
+  } else {
+    Serial.println("No cached IP, waiting for server...");
+  }
 
-  mic.begin(SERVER_HOST, SERVER_PORT, SERVER_PATH, cfg);
-  mic.onConnected(onMicConnected);
-  mic.onDisconnected(onMicDisconnected);
-  mic.onPlaybackStart(onPlaybackStart);
-  mic.onPlaybackEnd(onPlaybackEnd);
+  // Announce we're online (triggers server to publish IP)
+  Particle.publish("microstream/device-online", "", PRIVATE);
 }
 
 void loop() {
-  mic.update();
+  if (serverConfigured) {
+    mic.update();
+  }
 
   // --- Push-to-talk button ---
   bool pressed = (digitalRead(BUTTON_PIN) == LOW);
 
-  if (pressed && !buttonDown && mic.isConnected()) {
+  if (pressed && !buttonDown && serverConfigured && mic.isConnected()) {
     buttonDown = true;
     mic.startRecording();
     Serial.println("Recording...");
@@ -96,12 +153,14 @@ void loop() {
   }
 
   // --- LED feedback: on = connected, off = disconnected ---
-  digitalWrite(LED_PIN, mic.isConnected() ? HIGH : LOW);
+  digitalWrite(LED_PIN, serverConfigured && mic.isConnected() ? HIGH : LOW);
 
   // --- Status ---
   if (millis() - lastStatusTime > 5000) {
     lastStatusTime = millis();
-    if (mic.isConnected()) {
+    if (!serverConfigured) {
+      Serial.println("Status: WAITING FOR SERVER IP");
+    } else if (mic.isConnected()) {
       Serial.printlnf("Status: CONNECTED | Uptime: %lus", (millis() - connectedSince) / 1000);
     } else {
       Serial.println("Status: DISCONNECTED");
