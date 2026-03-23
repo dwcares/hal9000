@@ -1,0 +1,18 @@
+Reference,Quantity,Description,Manufacturer/Part,Notes
+J_PHOTON_L1,1,Conn_01x12 Female Header 2.54mm,,Through-hole socket for Particle Photon (left row)
+J_PHOTON_R1,1,Conn_01x12 Female Header 2.54mm,,Through-hole socket for Particle Photon (right row)
+U1,1,Particle Photon,Particle Photon Wi-Fi development board,Main MCU/module
+J_BATT1,1,Conn_01x02 Header 2.54mm,,Battery connection
+J_SW1,1,Conn_01x02 Header 2.54mm,,Power switch connection
+J_BUCK1,1,Conn_01x03 Header 2.54mm,,Buck/boost converter connection
+J_MIC1,1,Conn_01x03 Header 2.54mm,,Microphone module connection
+J_AMP1,1,Conn_01x03 Header 2.54mm,,Amplifier module connection
+J_LED1,1,Conn_01x02 Header 2.54mm,,LED connection
+SW1,1,6mm Tactile Pushbutton THT,,Push-to-talk button
+LED1,1,5mm LED,,Indicator LED
+R1,1,220 Ohm Resistor 0805,,LED current limiting resistor
+R2,1,1k Ohm Resistor 0805,,Mic input series/filter resistor
+C1,1,10nF Capacitor 0805,,Mic input filter capacitor
+C2,1,470uF Electrolytic Capacitor >=10V,,5V rail bulk capacitance
+MIC1,1,MAX9814 Microphone Amplifier Module,"Analog electret mic breakout, VCC/OUT/GND",External mic module
+AMP1,1,PAM8302A Mono 2.5W Class-D Amplifier Module,5V mono analog amp module,External amp module

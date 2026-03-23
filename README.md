@@ -1,6 +1,6 @@
 # HAL9000 Voice Assistant
 
-A voice assistant powered by OpenAI running on Particle microcontrollers. Press a button to talk, receive AI-generated spoken responses.
+A voice assistant powered by OpenAI running on Particle microcontrollers. Press a button to talk, receive AI-generated spoken responses. Designed to fit inside the [Moebius Models 1:1 HAL9000 kit](https://www.amazon.com/Moebius-Models-HAL9000-Styrene-MOE20015/dp/B07SVCLLFW).
 
 > "I'm sorry Dave, I'm afraid I can't do that."
 
@@ -8,27 +8,36 @@ A voice assistant powered by OpenAI running on Particle microcontrollers. Press 
 
 HAL9000 demonstrates bidirectional audio streaming between a Particle device (Photon/Argon) and a Node.js server. The server uses OpenAI's Whisper for speech-to-text, GPT for conversation, and TTS for speech synthesis.
 
-## Hardware Requirements
+## Hardware
+
+A custom carrier PCB is available for clean assembly. See the [hardware folder](hardware/) for KiCad source files and manufacturing outputs.
+
+![HAL9000 PCB](hardware/hal9000-kicad.png)
+
+### Components
 
 | Component | Description | Connection |
 |-----------|-------------|------------|
-| Particle Photon/Argon | Microcontroller | - |
-| Electret Microphone | With MAX4466 amplifier | A6 |
-| Speaker | 8Ω, 0.5W with PAM8403 amp | A3 (DAC) |
-| Push Button | Momentary, normally open | D3 |
-| LED (optional) | Status indicator | D0 |
+| Particle Photon | Wi-Fi MCU | Socket headers |
+| MAX9814 Mic Module | Electret mic with AGC amp | J_MIC1 (3.3V/MIC/GND) |
+| PAM8302A Amp Module | 2.5W Class-D mono amp | J_AMP1 (5V/AMP/GND) |
+| 6mm Tactile Button | Push-to-talk | SW1 |
+| 5mm LED | Status indicator | J_LED1 |
+| Battery + Switch | Power input | J_BATT1, J_SW1 |
+| Buck/Boost Converter | 5V regulated supply | J_BUCK1 |
 
-### Wiring Diagram
+### Quick Wiring (without PCB)
 
 ```
 Particle Photon
 ┌─────────────────┐
-│              A6 │──── Mic OUT (MAX4466)
-│              A3 │──── Amp IN (PAM8403)
+│              A6 │──── Mic OUT (MAX9814)
+│              A3 │──── Amp IN (PAM8302A)
 │              D3 │──── Button ────┐
 │             GND │────────────────┴── GND
-│            3.3V │──── Mic VCC, Amp VCC
-│              D0 │──── LED+ (optional)
+│            3.3V │──── Mic VCC
+│              5V │──── Amp VCC
+│              D0 │──── LED+
 └─────────────────┘
 ```
 
