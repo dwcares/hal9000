@@ -27,3 +27,9 @@ target/
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude Code
+.claude/settings.local.json
+
+# Package lock
+package-lock.json
