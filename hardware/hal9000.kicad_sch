@@ -1811,7 +1811,7 @@
 	)
 	(wire
 		(pts
-			(xy 180.34 121.92) (xy 167.64 121.92)
+			(xy 180.34 119.38) (xy 167.64 119.38)
 		)
 		(stroke
 			(width 0)
@@ -1881,6 +1881,16 @@
 	)
 	(wire
 		(pts
+			(xy 167.64 129.54) (xy 171.45 129.54)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "54d77273-9e4a-4909-a00a-0cadb71099af")
+	)
+	(wire
+		(pts
 			(xy 107.95 140.97) (xy 121.92 140.97)
 		)
 		(stroke
@@ -1908,16 +1918,6 @@
 			(type default)
 		)
 		(uuid "a6d6e315-aeb6-4763-8726-156ef2f2568a")
-	)
-	(wire
-		(pts
-			(xy 167.64 129.54) (xy 171.45 129.54)
-		)
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "a7a59a82-a0d0-488c-aba1-869f7b4b3d3a")
 	)
 	(wire
 		(pts
@@ -1951,7 +1951,7 @@
 	)
 	(wire
 		(pts
-			(xy 180.34 152.4) (xy 180.34 121.92)
+			(xy 180.34 152.4) (xy 180.34 119.38)
 		)
 		(stroke
 			(width 0)
@@ -2000,7 +2000,7 @@
 		(uuid "882b592b-8c9c-423d-afa7-58552e96fc17")
 	)
 	(label "D0"
-		(at 165.1 129.54 0)
+		(at 167.64 129.54 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2030,7 +2030,7 @@
 		(uuid "ae7fa84a-6383-4589-b9ba-0ac58e46deb9")
 	)
 	(label "D3"
-		(at 165.1 121.92 0)
+		(at 167.64 119.38 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -2833,7 +2833,7 @@
 			)
 		)
 		(property "Value" "+3V3"
-			(at 171.45 101.5999 90)
+			(at 170.18 101.6 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -2974,7 +2974,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder"
+		(property "Footprint" "Capacitor_THT:CP_Radial_D6.3mm_P2.50mm"
 			(at 79.7052 134.62 0)
 			(effects
 				(font
@@ -2992,7 +2992,7 @@
 				(hide yes)
 			)
 		)
-		(property "Description" "Unpolarized capacitor"
+		(property "Description" ""
 			(at 78.74 130.81 0)
 			(effects
 				(font
@@ -3359,16 +3359,16 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x12")
-		(at 162.56 116.84 180)
+		(at 162.56 114.3 0)
+		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(dnp no)
-		(fields_autoplaced yes)
 		(uuid "a1adeb5d-34b3-43ef-b2a7-f27c6b3bea17")
 		(property "Reference" "J_PHOTON_R1"
-			(at 162.56 95.25 0)
+			(at 162.814 93.98 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3376,7 +3376,7 @@
 			)
 		)
 		(property "Value" "Conn_01x12"
-			(at 162.56 97.79 0)
+			(at 162.052 96.52 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3384,7 +3384,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinSocket_2.54mm:PinSocket_1x12_P2.54mm_Vertical"
-			(at 162.56 116.84 0)
+			(at 162.56 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3393,7 +3393,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 162.56 116.84 0)
+			(at 162.56 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -3402,7 +3402,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x12, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 162.56 116.84 0)
+			(at 162.56 114.3 0)
 			(effects
 				(font
 					(size 1.27 1.27)
