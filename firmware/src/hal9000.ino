@@ -16,7 +16,7 @@
 
 // --- Hardware Pins ---
 #define LED_PIN      D0       // Status LED (or use D7 for onboard)
-#define BUTTON_PIN   D3       // Push-to-talk button
+#define BUTTON_PIN   D4       // Push-to-talk button
 #define MIC_PIN      A6       // Microphone input (DAC pin, works as ADC)
 #define SPEAKER_PIN  A3       // Speaker output (DAC: A3 on Photon, A6 on Argon)
 

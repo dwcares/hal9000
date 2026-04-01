@@ -33,7 +33,7 @@ Particle Photon
 ┌─────────────────┐
 │              A6 │──── Mic OUT (MAX9814)
 │              A3 │──── Amp IN (PAM8302A)
-│              D3 │──── Button ────┐
+│              D4 │──── Button ────┐
 │             GND │────────────────┴── GND
 │            3.3V │──── Mic VCC
 │              5V │──── Amp VCC
@@ -132,7 +132,7 @@ Edit the defines at the top of `hal9000.ino`:
 ```cpp
 #define MIC_PIN      A6       // Microphone input
 #define SPEAKER_PIN  A3       // Speaker output (DAC)
-#define BUTTON_PIN   D3       // Push-to-talk button
+#define BUTTON_PIN   D4       // Push-to-talk button
 #define LED_PIN      D0       // Status LED
 #define SERVER_PORT  5000
 ```

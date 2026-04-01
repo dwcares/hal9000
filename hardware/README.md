@@ -57,7 +57,7 @@ These modules connect via headers:
 |--------|------------|-------------|
 | MIC | A6 | Microphone analog input |
 | AMP | A3 (DAC) | Speaker DAC output |
-| BUTTON | D3 | Push-to-talk input |
+| BUTTON | D4 | Push-to-talk input |
 | LED | D0 | Status LED output |
 
 ## Power
